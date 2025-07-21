@@ -9,13 +9,17 @@ const songSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    songUrl: {
+        type: String,
+        requried: true
+    },
     artist:{
         type: String,
         required: true,
     },
-    album:{
-        type: String,
-        required: true,
+    playlist:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Playlist"
     },
     genre:{
         type: String,
@@ -27,11 +31,9 @@ const songSchema = new mongoose.Schema({
     },
     duration:{
         type: Number,
-        required: true,
     },
     lyrics:{
         type: String,
-        required: true,
     },
     coverimg:{
         type: String,
@@ -39,4 +41,4 @@ const songSchema = new mongoose.Schema({
     }
 }, {timestamps : true})
 
-module.exports = mongoose.model('song', songSchema)
+module.exports = mongoose.model('Song', songSchema)

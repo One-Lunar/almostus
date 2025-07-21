@@ -11,14 +11,6 @@ app.use(cors())
 app.use(express.json())
 app.use('/api',router)
 
-app.get('/',(req,res)=>{
-    try{
-        res.send('Almost Us')
-    }
-    catch(error){
-        res.status(500).send('Internal server error')
-    }
-})
 
 app.listen(PORT,async()=>{
     try{

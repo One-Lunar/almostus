@@ -3,7 +3,7 @@ const app=express()
 const PORT=process.env.PORT || 5000
 const cors =require('cors')
 const connectdb=require('./config/db')
-const songRoutes = require('./routes/routes')
+const songRoutes = require('./routes/songroutes')
 
 require('dotenv').config();
 

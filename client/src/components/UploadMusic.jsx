@@ -10,7 +10,7 @@ const UploadMusic = () => {
     author: '',
     songUrl: '',
     artist: '',
-    playlist: '',
+    playlist: '687f8c35dac8e8332bedd022',
     genre: '',
     date: '',
     duration: '',

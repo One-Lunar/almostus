@@ -3,24 +3,24 @@ const Playlist = require('../models/playlist.model')
 
 const postPlaylist = async (req, res) => {
     try {
-        const { title, description, author } = req.body 
-        const newPlaylist = new Playlist({ title, description, author }) 
+        const { title, description, author, coverimg } = req.body 
+        const newPlaylist = new Playlist({ title, description, author , coverimg }) 
         await newPlaylist.save() 
         res.status(201).json({ message: 'Playlist created successfully', playlist: newPlaylist }) 
     } catch (error) {
         res.status(500).json({ message: 'Error creating playlist', error: error.message }) 
     }
-} 
+}
 
 
 const getPlaylists = async (req, res) => {
     try {
-        const playlists = await Playlist.find() 
+        const playlists = await Playlist.find()
         res.status(200).json(playlists) 
     } catch (error) {
         res.status(500).json({ message: 'Error fetching playlists', error: error.message }) 
     }
-} 
+}
 
 
 const getPlaylistById = async (req, res) => {
@@ -65,10 +65,11 @@ const deletePlaylist = async (req, res) => {
     }
 } 
 
+
 module.exports = {
     postPlaylist,
     getPlaylists,
     getPlaylistById,
     updatePlaylist,
     deletePlaylist
-} 
+}

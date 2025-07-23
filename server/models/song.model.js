@@ -15,7 +15,6 @@ const songSchema = new mongoose.Schema({
     },
     artist:{
         type: String,
-        required: true,
     },
     playlist:{
         type: mongoose.Schema.Types.ObjectId,
@@ -23,11 +22,9 @@ const songSchema = new mongoose.Schema({
     },
     genre:{
         type: String,
-        required: true,
     },
     date:{
         type: Date,
-        required: true,
     },
     duration:{
         type: Number,

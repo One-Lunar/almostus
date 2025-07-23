@@ -1,8 +1,9 @@
 const express=require('express')
-const app=express()
+
 const PORT=process.env.PORT || 8080
 const cors =require('cors')
 const connectdb=require('./config/db')
+const { app, server } = require('./config/socket')
 
 const songRoutes = require('./routes/song.route')
 const playlistRoutes = require('./routes/playlist.route')
@@ -21,7 +22,7 @@ app.get('/ping', (req, res) => {
   res.send('pong');
 });
 
-app.listen(PORT,async()=>{
+server.listen(PORT,async()=>{
     try{
         await connectdb()
         console.log(`Server is running in PORT ${PORT}`)

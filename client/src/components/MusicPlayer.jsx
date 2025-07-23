@@ -1,7 +1,8 @@
 import { Dot, Pause, Play, SkipBack, SkipForward, ThermometerIcon } from 'lucide-react'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { socket } from '../utils/socket'
 
-const MusicPlayer = ({songs, currentIndex, setCurrentIndex}) => {
+const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex}) => {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
   // const songs = [
@@ -12,15 +13,17 @@ const MusicPlayer = ({songs, currentIndex, setCurrentIndex}) => {
 
   const playSong = async () => {
     if (audioRef.current) {
-      await audioRef.current.play()
       setIsPlaying(true)
+      await audioRef.current.play()
+      roomId && socket.emit("playing", {roomId, playing: true})
     }
   }
 
   const pauseSong = async () => {
     if (audioRef.current) {
-      await audioRef.current.pause()
       setIsPlaying(false)
+      await audioRef.current.pause()
+      roomId && socket.emit("playing", {roomId, playing: false})
     }
   }
 
@@ -40,11 +43,30 @@ const MusicPlayer = ({songs, currentIndex, setCurrentIndex}) => {
     setIsPlaying(true)
   }
 
+  useEffect(() => {
+    if(isPlaying){
+      audioRef.current.play()
+      
+    }
+    else{
+      audioRef.current.pause()
+    }
+  }, [isPlaying])
+  useEffect(() => {
+    socket.on("playing", (playing) => {
+      setIsPlaying(playing)
+      
+    })
 
+    return () => {
+      socket.off("playing")
+    }
+  }, [])
   React.useEffect(() => {
     if (audioRef.current) {
+      socket.emit('set-current-idx', {playlistId, roomId, currentIdx: currentIndex})
       audioRef.current.load()
-      playSong()
+      setIsPlaying(true)
     }
   }, [currentIndex])
 

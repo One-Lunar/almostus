@@ -17,7 +17,7 @@ const PlaylistInfo = () => {
   useEffect(() => {
     const fetchPlaylist = async () => {
       try {
-        const res = await axios.get(`http://localhost:8080/api/playlists/${id}`)
+        const res = await axios.get(`https://almostus.onrender.com/api/playlists/${id}`)
         setPlaylist(res.data)
       } catch (err) {
         setError('Error fetching playlist details',err)

@@ -21,7 +21,7 @@ const CreatePlaylist = () => {
     setMessage('')
     setError('')
     try {
-      const response = await axios.post('http://localhost:8080/api/playlists/post', formData)
+      const response = await axios.post(`https://almostus.onrender.com/api/playlists/post`, formData)
       setMessage(response.data.message)
       setFormData({ title: '', description: '', author: '', coverimg: '' })
     } catch (err) {

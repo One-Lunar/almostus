@@ -2,12 +2,15 @@ const app = require('express')()
 const http = require('http')  
 const { Server } = require('socket.io')  
 const server = http.createServer(app)  
+require('dotenv').config()
 
 const io = new Server(server, {
   cors: {
-    origin: "https://almostus.vercel.app/"
+    // origin: "https://almostus.vercel.app/"
+    origin: process.env.ENV == "development" ? "http://localhost:5173" : "https://almostus.vercel.app"
   },
 })  
+console.log(process.env.ENV, process.env.ENV == "development" ? "it is development" : "it is production")
 
 const rooms = new Map()   // Map<roomId, { users: Set, playlistId: string|null, currentIndex: number|null }>
 const randomNames = [

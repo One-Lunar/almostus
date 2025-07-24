@@ -9,7 +9,7 @@ const songRoutes = require('./routes/song.route')
 const playlistRoutes = require('./routes/playlist.route')
 
 require('dotenv').config();
-
+console.log(process.env.ENV, process.env.ENV == "development" ? "it is development" : "it is production")
 app.use(cors({
     // origin: "https://almostus.vercel.app/"
     origin: process.env.ENV == "development" ? "http://localhost:5173" : "https://almostus.vercel.app"

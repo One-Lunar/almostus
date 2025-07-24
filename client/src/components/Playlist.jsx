@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const PlaylistList = () => {
   const [playlists, setPlaylists] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -24,6 +26,14 @@ const PlaylistList = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 ">
+      <div>
+        <button
+        onClick={() => navigate('/rooms/join')}
+        className='bg-white cursor-pointer  text-zinc-800 p-2 rounded-md text-md'
+        >
+          Join Room
+        </button>
+      </div>
       <h2 className="relative z-10 text-3xl font-bold text-center mb-6 text-white">All Playlists</h2>
       {loading && <p className="text-center">Loading...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}

@@ -130,76 +130,85 @@ const Room = () => {
   } 
 
 return (
-  <div className="text-white">
-    <div className='text-4xl font-black'>Room ID: {roomId}</div>
+  <div className="min-h-screen bg-zinc-900 text-white px-6 py-8 space-y-8">
+    <div className="text-2xl font-semibold tracking-tight">Room ID: {roomId}</div>
 
-    <div className='m-5'>
-      <h1>Members</h1>
-      <ul className="flex items-center gap-3 ,y-2 w-screen ">
-        {users && users?.map((user) => (
-          <li key={user} className="bg-zinc-800 border text-xs border-zinc-700 rounded-md p-2">
+    <div className="space-y-2">
+      <h2 className="text-sm uppercase tracking-widest text-zinc-400">Members</h2>
+      <ul className="flex flex-wrap items-center gap-3">
+        {users?.map((user) => (
+          <li
+            key={user}
+            className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full px-4 py-1 text-xs"
+          >
             {user[1]}
           </li>
         ))}
       </ul>
     </div>
 
-
-       {!playlistId && 
-       <div className="flex w-screen flex-wrap items-center gap-4 justify-center">
-        {playlists && playlists?.map((playlist) => (
+    {!playlistId && (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {playlists?.map((playlist) => (
           <div
             key={playlist._id}
-            className="flex rounded-md items-center justify-between px-2 gap-3 bg-zinc-800 border border-zinc-700 w-60"
+            className="flex items-center gap-4 p-4 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
           >
-            <img src={playlist.coverimg} className="w-15 h-15 rounded-md p-1" alt={playlist.title} />
-            <h1>{playlist.title}</h1>
+            <img
+              src={playlist.coverimg}
+              alt={playlist.title}
+              className="w-16 h-16 object-cover rounded-lg"
+            />
+            <div className="flex-1">
+              <h3 className="text-base font-medium text-white">{playlist.title}</h3>
+            </div>
             <button
               onClick={() => selectPlaylist(playlist._id)}
-              className="text-xs rounded-sm bg-white text-black p-1"
+              className="text-xs px-3 py-1 bg-white text-zinc-900 rounded hover:bg-zinc-200 transition"
             >
               Select
             </button>
           </div>
         ))}
       </div>
-       }
+    )}
 
-
-    {/* <div>
-      <button onClick={() =>  changePlaylist()} className="text-xs rounded-sm bg-white text-black p-1 m-4">
-        Change Playlist
-      </button>
-    </div> */}
-
-    <div className='flex flex-col gap-2 justify-center items-center'>
-      {songs && songs?.map((song, idx) => (
+    <div className="flex flex-col gap-3 mb-20 items-center">
+      {songs?.map((song, idx) => (
         <div
           key={song._id}
           onClick={() => selectedSong(idx)}
-          className="flex cursor-pointer w-11/12 lg:w-1/2 rounded-md items-center px-2 gap-3 bg-zinc-800 border border-zinc-700"
+          className="flex items-center gap-4 w-full max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
         >
-          <img src={song.coverimg} className="w-15 h-15 rounded-md p-1" alt={song.title} />
-        <div>
-            <h1 className='text-sm'>{song.title}</h1>
-          <h1 className='text-xs'>{song.author}</h1>
-        </div>
+          <img
+            src={song.coverimg}
+            alt={song.title}
+            className="w-16 h-16 object-cover rounded-md"
+          />
+          <div>
+            <h4 className="text-sm font-medium text-white">{song.title}</h4>
+            <p className="text-xs text-zinc-400">{song.author}</p>
+          </div>
         </div>
       ))}
     </div>
 
     {songs && (
-      <MusicPlayer
-        roomId={roomId}
-        playlistId={playlistId}
-        songs={songs}
-        currentIndex={currentIndex}
-        setCurrentIndex={setCurrentIndex}
-      />
+      <div className="mt-8">
+        <MusicPlayer
+          roomId={roomId}
+          playlistId={playlistId}
+          songs={songs}
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
+        />
+      </div>
     )}
-    <NotificationModal messages={messages}/>
+
+    <NotificationModal messages={messages} />
   </div>
 )
+
 
 
 } 

@@ -11,7 +11,7 @@ const playlistRoutes = require('./routes/playlist.route')
 require('dotenv').config();
 
 app.use(cors({
-    origin: process.env.NODE_ENV == "development" ? "http://localhost:5173" :  "https://almostus.vercel.app",
+    origin: "https://almostus.vercel.app"
 }));
 app.use(express.json())
 

@@ -1,10 +1,13 @@
-import React, { useState } from 'react' 
+import React, { useState, useEffect, useRef } from 'react' 
 import { useSongStore } from '../stores/useSongStore' 
 import axios from 'axios' 
 import { Plus } from 'lucide-react'
-import { useRef } from 'react'
+import { useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 const UploadMusic = () => {
+  const { id } = useParams() 
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -19,8 +22,44 @@ const UploadMusic = () => {
   }) 
 
   const [uploadingAudio, setUploadingAudio] = useState(false) 
-  const { postMusic } = useSongStore() 
+  const { postMusic, getSingleSong, updateMusic } = useSongStore() 
   const audioRef = useRef()
+
+  useEffect(() => {
+    if (id) { 
+      const fetchSong = async () => {
+        const song = await getSingleSong(id)
+        if (song) {
+          setFormData({
+            title: song.title || '',
+            author: song.author || '',
+            songUrl: song.songUrl || '',
+            artist: song.artist || '',
+            playlist: song.playlist || '',
+            genre: song.genre || '',
+            date: song.date ? song.date.slice(0, 10) : '',
+            duration: song.duration || '',
+            lyrics: song.lyrics || '',
+            coverimg: song.coverimg || '',
+          })
+        }
+      }
+      fetchSong()
+    } else {
+      setFormData({
+        title: '',
+        author: '',
+        songUrl: '',
+        artist: '',
+        playlist: '6880e41cae1307047b0c4245',
+        genre: '',
+        date: '',
+        duration: '',
+        lyrics: '',
+        coverimg: '',
+      })
+    }
+  }, [id])
 
   const handleChange = (e) => {
     const { name, value } = e.target 
@@ -60,24 +99,20 @@ const UploadMusic = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault() 
-    await postMusic(formData) 
-    setFormData({
-    title: '',
-    author: '',
-    songUrl: '',
-    artist: '',
-    playlist: '',
-    genre: '',
-    date: '',
-    duration: '',
-    lyrics: '',
-    coverimg: '',
-  })
+    if (id) {
+      await updateMusic(id, formData)
+      alert('Song updated!')
+      navigate('/songs') 
+    } else {
+      await postMusic(formData)
+      alert('Song uploaded!')
+      navigate('/songs') 
+    }
   } 
 
   return (
     <div className="font-sans text-zinc-900 dark:text-zinc-100 max-w-5xl mx-auto mt-10 p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm">
-      <h2 className="text-2xl font-semibold mb-6">Upload Music</h2>
+      <h2 className="text-2xl font-semibold mb-6">{id ? 'Edit Song' : 'Upload Music'}</h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {[
@@ -168,7 +203,7 @@ const UploadMusic = () => {
             className="w-full px-4 py-2 text-sm font-medium text-zinc-800 bg-gray-100 hover:bg-gray-200 cursor-pointer rounded-lg shadow outline-none"
             disabled={uploadingAudio}
           >
-            {uploadingAudio ? 'Uploading Audio...' : 'Upload'}
+            {uploadingAudio ? 'Uploading Audio...' : id ? 'Save Changes' : 'Upload'}
           </button>
         </div>
       </form>
@@ -176,4 +211,4 @@ const UploadMusic = () => {
   ) 
 } 
 
-export default UploadMusic 
+export default UploadMusic

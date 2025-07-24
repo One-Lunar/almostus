@@ -11,7 +11,7 @@ import JoinRoom from './components/JoinRoom'
 import Room from './components/Room'
 
 const App = () => {
-
+  console.log(import.meta.env.VITE_ENV)
   return (
     <BrowserRouter>
             <Routes>

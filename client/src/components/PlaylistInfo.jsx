@@ -11,13 +11,14 @@ const PlaylistInfo = () => {
   const [error, setError] = useState('')
   const [currentIndex, setCurrentIndex] = useState(0)
   
+  const baseUrl = import.meta.env.VITE_ENV == "development" ? "http://localhost:8080" : "https://almostus.onrender.com"
 
   const { songs, getSongsByPlaylist} = usePlaylistStore()
 
   useEffect(() => {
     const fetchPlaylist = async () => {
       try {
-        const res = await axios.get(`https://almostus.onrender.com/api/playlists/${id}`)
+        const res = await axios.get(`${baseUrl}/api/playlists/${id}`)
         setPlaylist(res.data)
       } catch (err) {
         setError('Error fetching playlist details',err)

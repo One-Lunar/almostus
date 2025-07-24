@@ -6,13 +6,14 @@ const PlaylistList = () => {
   const [playlists, setPlaylists] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const baseUrl = import.meta.env.VITE_ENV == "development" ? "http://localhost:8080" : "https://almostus.onrender.com"
 
   const navigate = useNavigate()
 
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        const response = await axios.get(`https://almostus.onrender.com/api/playlists/all`)
+        const response = await axios.get(`${baseUrl}/api/playlists/all`)
         setPlaylists(response.data)
       } catch (err) {
         setError('Error fetching playlists',err)

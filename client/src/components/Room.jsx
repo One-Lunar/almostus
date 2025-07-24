@@ -4,6 +4,7 @@ import { socket } from '../utils/socket'
 import { usePlaylistStore } from '../stores/usePlaylistStore' 
 import MusicPlayer from './MusicPlayer' 
 import NotificationModal from './NotificationModal'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 
 const Room = () => {
   const { id: roomId } = useParams() 
@@ -11,7 +12,7 @@ const Room = () => {
 
   const playlistId = searchParams.get('playlist') 
   const currentIdxParam = searchParams.get('currentIdx') 
-
+  const [isPlaylistOpen, setIsPlaylistOpen] = useState(false)
   const [users, setUsers] = useState([]) 
   const [currentIndex, setCurrentIndex] = useState(Number(currentIdxParam) || 0) 
   const [messages, setMessages] = useState([])
@@ -76,8 +77,6 @@ const Room = () => {
     socket.on('playlist', playlistAddHandler) 
     socket.on('room-state', roomStateHandler) 
 
-
-
     return () => {
       socket.off('room-state', roomStateHandler) 
       socket.off('playlist', playlistAddHandler) 
@@ -129,6 +128,7 @@ const Room = () => {
     }) 
   } 
 
+
 return (
   <div className="min-h-screen bg-zinc-900 text-white px-6 py-8 space-y-8">
     <div className="text-2xl font-semibold tracking-tight">Room ID: {roomId}</div>
@@ -148,7 +148,21 @@ return (
     </div>
 
     {!playlistId && (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div className="w-full space-y-4">
+    <button
+      onClick={() => setIsPlaylistOpen(!isPlaylistOpen)}
+      className="flex items-center gap-2 text-sm px-4 py-2 bg-zinc-800 text-white border border-zinc-700 rounded-lg hover:border-zinc-600 transition"
+    >
+      {isPlaylistOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      {isPlaylistOpen ? 'Hide Playlists' : 'Show Playlists'}
+    </button>
+      
+    <div
+      className={`transition-all duration-300 ease-in-out ${
+        isPlaylistOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'
+      }`}
+    >
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
         {playlists?.map((playlist) => (
           <div
             key={playlist._id}
@@ -171,7 +185,9 @@ return (
           </div>
         ))}
       </div>
-    )}
+    </div>
+  </div>
+)}
 
     <div className="flex flex-col gap-3 mb-20 items-center">
       {songs?.map((song, idx) => (

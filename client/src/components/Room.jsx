@@ -147,7 +147,7 @@ return (
       </ul>
     </div>
 
-    {!playlistId && (
+    {(!songs) && (
   <div className="w-full space-y-4">
     <button
       onClick={() => setIsPlaylistOpen(!isPlaylistOpen)}

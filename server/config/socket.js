@@ -134,12 +134,13 @@ io.on('connection', (socket) => {
     rooms.set(roomKey, room)  
     
   })  
-  socket.on('shuffle', (data) => {
-    const roomKey = data?.roomId?.toString()  
-    const room = rooms.get(roomKey) 
-    io.to(roomKey).emit('shuffle', data)
-    io.to(roomKey).emit('msg', `${room.users.get(socket.id)} turned on shuffle mode`)  
-  })
+  // Future 
+  // socket.on('shuffle', (data) => {
+  //   const roomKey = data?.roomId?.toString()  
+  //   const room = rooms.get(roomKey) 
+  //   io.to(roomKey).emit('shuffle', data)
+  //   io.to(roomKey).emit('msg', `${room.users.get(socket.id)} turned on shuffle mode`)  
+  // })
 
   socket.on('playing', (data) => {
     const roomKey = data?.roomId?.toString() 

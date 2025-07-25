@@ -9,9 +9,10 @@ import {BrowserRouter,Routes,Route} from 'react-router-dom';
 import { socket } from './utils/socket'
 import JoinRoom from './components/JoinRoom'
 import Room from './components/Room'
+import SongList from './components/SongList'
 
 const App = () => {
-  console.log(import.meta.env.VITE_ENV)
+  // console.log(import.meta.env.VITE_ENV)
   return (
     <BrowserRouter>
             <Routes>
@@ -21,9 +22,11 @@ const App = () => {
                 <Route path='/playlist/:id' element={<PlaylistInfo/>}/>
                 <Route path='/rooms/join' element={<JoinRoom />}/>
                 <Route path='/rooms/:id' element={<Room />}/>
+                <Route path='/edit/:id' element={<UploadMusic />} />
+                <Route path='/songs' element={<Songs />} />
+                <Route path='/songlist' element={<SongList/>}/>
             </Routes>
     </BrowserRouter>
-
   )
 }
 

@@ -43,12 +43,13 @@ const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex})
   const nextSong = () => {
 
     setCurrentIndex((prevIndex) => {
-      let newIndex = prevIndex
-      if(isShuffle){
-        newIndex = Math.floor(Math.random() * songs.length)
-      }else{
-        newIndex = (prevIndex + 1) % songs.length
-      }
+      // Future 
+      // let newIndex = prevIndex
+      // if(isShuffle){
+      //   newIndex = Math.floor(Math.random() * songs.length)
+      // }else{
+      // }
+      let newIndex = (prevIndex + 1) % songs.length
       socket.emit('current-idx', {roomId, currentIdx: newIndex, onLoad: false, mode: 'next'})
       
       return newIndex

@@ -147,7 +147,11 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomKey)  
     io.to(roomKey).emit('msg', `${room.users.get(socket.id)} ${data.playing ? "played the song" : "paused the song"}`)  
     io.to(roomKey).emit('playing', data.playing)  
-  })  
+  }) 
+  socket.on('duration', (data) => {
+    const roomKey = data?.roomId?.toString() 
+    io.to(roomKey).emit('duration', data)
+  })   
 
   socket.on('disconnect', () => {
     rooms.forEach((room, roomId) => {

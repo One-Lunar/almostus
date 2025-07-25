@@ -1,179 +1,191 @@
-import React, { useState } from 'react' 
-import { useSongStore } from '../stores/useSongStore' 
-import axios from 'axios' 
-import { Plus } from 'lucide-react'
-import { useRef } from 'react'
+import React, { useRef, useState } from "react";
+import axios from "axios";
+import { useSongStore } from "../stores/useSongStore"; // make sure this exists
 
 const UploadMusic = () => {
-  const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    songUrl: '',
-    artist: '',
-    playlist: '6880e41cae1307047b0c4245',
-    genre: '',
-    date: '',
-    duration: '',
-    lyrics: '',
-    coverimg: '',
-  }) 
+  const [audioFiles, setAudioFiles] = useState([]);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [formInputs, setFormInputs] = useState({});
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef();
+  const { postMusic } = useSongStore();
 
-  const [uploadingAudio, setUploadingAudio] = useState(false) 
-  const { postMusic } = useSongStore() 
-  const audioRef = useRef()
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const droppedFiles = Array.from(e.dataTransfer.files).filter(file =>
+      file.type.startsWith("audio/")
+    );
+    setAudioFiles(prev => [...prev, ...droppedFiles]);
+  };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target 
-    setFormData(prev => ({
+  const handleDragOver = (e) => e.preventDefault();
+
+  const handleFileInput = (e) => {
+    const selectedFiles = Array.from(e.target.files).filter(file =>
+      file.type.startsWith("audio/")
+    );
+    setAudioFiles(prev => [...prev, ...selectedFiles]);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormInputs(prev => ({
       ...prev,
-      [name]: value,
-    })) 
-  } 
+      [audioFiles[selectedIndex]?.name]: {
+        ...(prev[audioFiles[selectedIndex]?.name] || {}),
+        [name]: value,
+      },
+    }));
+  };
 
-  const handleAudioUpload = async (e) => {
-    const file = e.target.files[0] 
-    if (!file) return 
+  const handleSubmit = async () => {
+    setUploading(true);
 
-    setUploadingAudio(true) 
+    for (const file of audioFiles) {
+      const metadata = formInputs[file.name] || {};
 
-    const data = new FormData() 
-    data.append('file', file) 
-    data.append('upload_preset', 'almost')  
-    data.append('resource_type', 'video')  
+      try {
+        // Upload audio to Cloudinary
+        const audioData = new FormData();
+        audioData.append("file", file);
+        audioData.append("upload_preset", "almost");
+        audioData.append("resource_type", "video");
 
-    try {
-      const res = await axios.post(
-        'https://api.cloudinary.com/v1_1/dycx19qo7/video/upload', 
-        data
-      ) 
-      setFormData(prev => ({
-        ...prev,
-        songUrl: res.data.secure_url,
-      })) 
-    } catch (err) {
-      console.error('Audio upload failed:', err) 
-      alert('Failed to upload audio.') 
-    } finally {
-      setUploadingAudio(false) 
+        const audioRes = await axios.post(
+          "https://api.cloudinary.com/v1_1/dycx19qo7/video/upload",
+          audioData
+        );
+
+        const songUrl = audioRes.data.secure_url;
+
+        // Post music with form data
+        await postMusic({
+          title: metadata.title || "",
+          author: metadata.author || "",
+          coverimg: metadata.coverImg || "",
+          playlist: metadata.playlist || "6880e41cae1307047b0c4245",
+          songUrl,
+        });
+
+        console.log(`✅ Uploaded ${file.name}`);
+      } catch (err) {
+        console.error(`❌ Failed to upload ${file.name}:`, err);
+        alert(`Upload failed for ${file.name}`);
+      }
     }
-  } 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault() 
-    await postMusic(formData) 
-    setFormData({
-    title: '',
-    author: '',
-    songUrl: '',
-    artist: '',
-    playlist: '',
-    genre: '',
-    date: '',
-    duration: '',
-    lyrics: '',
-    coverimg: '',
-  })
-  } 
+    // Reset after upload
+    setAudioFiles([]);
+    setFormInputs({});
+    setSelectedIndex(null);
+    setUploading(false);
+    alert("✅ All files uploaded");
+  };
 
   return (
-    <div className="font-sans text-zinc-900 dark:text-zinc-100 max-w-5xl mx-auto mt-10 p-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm">
-      <h2 className="text-2xl font-semibold mb-6">Upload Music</h2>
-
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {[
-          { name: 'title', label: 'Title' },
-          { name: 'author', label: 'Author' },
-          { name: 'artist', label: 'Artist' },
-          { name: 'coverimg', label: 'Cover Image URL' },
-          { name: 'playlist', label: 'Playlist Name' },
-          { name: 'duration', label: 'Duration (e.g., 365 in seconds)' },
-          { name: 'date', label: 'Release Date', type: 'date' },
-        ].map(({ name, label, type = 'text' }) => (
-          <div key={name}>
-            <label htmlFor={name} className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-              {label}
-            </label>
-            <input
-              type={type}
-              name={name}
-              id={name}
-              value={formData[name]}
-              onChange={handleChange}
-              className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg shadow-sm outline-none"
-            />
+    <div className="flex h-screen w-full bg-zinc-950 text-white">
+      {/* Sidebar */}
+      <div className="w-1/4 bg-zinc-900 border-r border-zinc-800 p-4 overflow-y-auto">
+        <h2 className="text-lg font-semibold mb-4">Uploaded Audios</h2>
+        {audioFiles.map((file, index) => (
+          <div
+            key={file.name + index}
+            onClick={() => setSelectedIndex(index)}
+            className={`cursor-pointer px-3 py-2 mb-2 rounded-md ${
+              selectedIndex === index ? "bg-zinc-800" : "hover:bg-zinc-800/50"
+            }`}
+          >
+            🎵 {file.name}
           </div>
         ))}
+      </div>
 
-
-        <div>
-          <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-            Upload Audio File
-          </label>
-          <button className='cursor-pointer  border border-zinc-500 rounded-sm' onClick={() => audioRef.current.click()}>
-            <Plus />
-          </button>
+      {/* Main Area */}
+      <div className="flex-1 flex flex-col p-6">
+        {/* Dropzone */}
+        <div
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onClick={() => fileInputRef.current.click()}
+          className="border-2 border-dashed border-zinc-700 p-8 rounded-lg text-center cursor-pointer hover:border-zinc-500 mb-6"
+        >
+          <p className="text-zinc-400">Drag & drop audio files here or click to upload</p>
           <input
-            ref={audioRef} 
+            ref={fileInputRef}
             type="file"
             accept="audio/*"
-            onChange={handleAudioUpload}
-            className="w-full hidden"
-          />
-          {uploadingAudio && <p className="text-sm mt-1 text-blue-500">Uploading audio...</p>}
-          {formData.songUrl && (
-            <audio controls src={formData.songUrl} className="mt-2 w-full" />
-          )}
-        </div>
-
-
-        <div>
-          <label htmlFor="genre" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-            Genre
-          </label>
-          <select
-            name="genre"
-            id="genre"
-            value={formData.genre}
-            onChange={handleChange}
-            className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg shadow-sm outline-none"
-            required
-          >
-            <option value="">Select Genre</option>
-            <option value="hiphop">Hip Hop</option>
-            <option value="pop">Pop</option>
-            <option value="rock">Rock</option>
-            <option value="electronic">Electronic</option>
-          </select>
-        </div>
-
-
-        <div className="md:col-span-2">
-          <label htmlFor="lyrics" className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-            Lyrics
-          </label>
-          <textarea
-            name="lyrics"
-            id="lyrics"
-            rows="4"
-            value={formData.lyrics}
-            onChange={handleChange}
-            className="w-full px-3 py-2 text-sm bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-300 dark:border-zinc-700 rounded-lg shadow-sm outline-none"
+            multiple
+            hidden
+            onChange={handleFileInput}
           />
         </div>
 
+        {/* Details Form */}
+        {selectedIndex !== null && audioFiles[selectedIndex] && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm mb-1">Title</label>
+              <input
+                type="text"
+                name="title"
+                value={formInputs[audioFiles[selectedIndex].name]?.title || ""}
+                onChange={handleInputChange}
+                className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm mb-1">Author</label>
+              <input
+                type="text"
+                name="author"
+                value={formInputs[audioFiles[selectedIndex].name]?.author || ""}
+                onChange={handleInputChange}
+                className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 outline-none"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm mb-1">Cover Image URL</label>
+              <img src={formInputs[audioFiles[selectedIndex].name]?.coverImg || ""} className="w-30" alt="" />
+              <input
+                type="text"
+                name="coverImg"
+                value={formInputs[audioFiles[selectedIndex].name]?.coverImg || ""}
+                onChange={handleInputChange}
+                className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 outline-none"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm mb-1">Playlist</label>
+              <input
+                type="text"
+                name="playlist"
+                value={formInputs[audioFiles[selectedIndex].name]?.playlist || ""}
+                onChange={handleInputChange}
+                className="w-full p-2 rounded bg-zinc-800 border border-zinc-700 outline-none"
+              />
+            </div>
+          </div>
+        )}
 
-        <div className="md:col-span-2">
-          <button
-            type="submit"
-            className="w-full px-4 py-2 text-sm font-medium text-zinc-800 bg-gray-100 hover:bg-gray-200 cursor-pointer rounded-lg shadow outline-none"
-            disabled={uploadingAudio}
-          >
-            {uploadingAudio ? 'Uploading Audio...' : 'Upload'}
-          </button>
-        </div>
-      </form>
+        {/* Submit Button */}
+        {audioFiles.length > 0 && (
+          <div className="mt-6">
+            <button
+              onClick={handleSubmit}
+              disabled={uploading}
+              className={`px-6 py-2 rounded ${
+                uploading
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-400 text-black"
+              }`}
+            >
+              {uploading ? "Uploading..." : "Submit All"}
+            </button>
+          </div>
+        )}
+      </div>
     </div>
-  ) 
-} 
+  );
+};
 
-export default UploadMusic 
+export default UploadMusic;

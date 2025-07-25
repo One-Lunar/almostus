@@ -5,6 +5,8 @@ import { socket } from '../utils/socket'
 const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex}) => {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
+
+
   // const [isShuffle, setIsShuffle] = useState(false)
 
 
@@ -85,10 +87,42 @@ const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex})
       socket.off("playing")
     }
   }, [])
+  
+
+
+useEffect(() => {
+
+  socket.emit('duration', {roomId, currentTime: audioRef.current.currentTime})
+
+  socket.on('duration', data => {
+    if(audioRef.current){
+      audioRef.current.currentTime = data.currentTime;
+    }
+  })
+
+  return () => {
+    socket.off('duration')
+  }
+
+}, [roomId])
+
+useEffect(() => {
+  const coverImg = songs[currentIndex]?.coverimg;
+  if (!coverImg) return;
+
+  const link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+  link.rel = 'icon';
+  link.href = coverImg;
+  link.type = 'image/png';
+
+  document.head.appendChild(link);
+}, [currentIndex, songs]);
+
   React.useEffect(() => {
     if (audioRef.current) {
       socket.emit('current-idx', {roomId, currentIdx: currentIndex, mode: 'load'})
       audioRef.current.load()
+      console.log("Audio", audioRef.current.duration)
       setIsPlaying(true)
     }
     if(currentIndex == -1){
@@ -98,7 +132,11 @@ const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex})
 
   return (
   <div className="fixed bottom-0 left-0 w-full bg-zinc-900/80 backdrop-blur border-t border-zinc-800 px-6 py-4">
-  <audio ref={audioRef} autoPlay onEnded={nextSong}>
+  <audio
+  ref={audioRef} 
+  autoPlay 
+  onEnded={nextSong}
+  >
     <source src={songs[currentIndex]?.songUrl} type="audio/mpeg" />
     Your browser does not support the audio element.
   </audio>

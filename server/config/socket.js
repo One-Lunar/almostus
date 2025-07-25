@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
       room = {
         users: new Map(),
         playlistId: null,
-        currentIndex: null,
+        currentIndex: -1,
       }  
     }
 
@@ -89,9 +89,9 @@ io.on('connection', (socket) => {
     io.to(roomKey).emit('room-info', Array.from(room.users))  
 
     // Send the room state ONLY to the new user
-    socket.emit('room-state', {
+    io.to(roomKey).emit('room-state', {
       playlistId: room.playlistId,
-      currentIndex: room.currentIndex ?? 0,
+      currentIndex: room.currentIndex ?? -1,
     })  
   })  
 
@@ -101,25 +101,45 @@ io.on('connection', (socket) => {
     if (!room) return  
 
     room.playlistId = data.playlistId  
-    room.currentIndex = 0   // reset index when new playlist selected
+    room.currentIndex = -1   // reset index when new playlist selected
+
+    io.to(roomKey).emit('room-state', {
+      playlistId: room.playlistId,
+      currentIndex: room.currentIndex ?? -1,
+    }) 
+
     rooms.set(roomKey, room)  
 
-    io.to(roomKey).emit('msg', `${room.users.get(socket.id)} selected a playlist`)  
-    io.to(roomKey).emit('playlist', data.playlistId)  
-    io.to(roomKey).emit('current-idx', 0)   // sync index
+    if(data.playlistId != null){
+      io.to(roomKey).emit('msg', `${room.users.get(socket.id)} selected a playlist`)  
+    }
   })  
 
-  socket.on('set-current-idx', (data) => {
+  socket.on('current-idx', (data) => {
     const roomKey = data?.roomId?.toString()  
     const room = rooms.get(roomKey)  
     if (!room) return  
 
-    room.currentIndex = data.currentIdx  
-    rooms.set(roomKey, room)  
+    room.currentIndex = data.currentIdx 
+    
+    io.to(roomKey).emit('room-state', {
+      playlistId: room.playlistId ?? null,
+      currentIndex: room.currentIndex ?? -1,
+    }) 
+    const message = `${room.users.get(socket.id)} ${data.mode == "select" ? "selected" : data.mode == "next" ? "forwarded" : "backwarded" } the song`
+    if(data.mode != "load"){
+      io.to(roomKey).emit('msg', message)
+    }
 
-    // io.to(roomKey).emit('msg', `${room.users.get(socket.id)} changed the song`)  
-    io.to(roomKey).emit('current-idx', data.currentIdx)  
+    rooms.set(roomKey, room)  
+    
   })  
+  socket.on('shuffle', (data) => {
+    const roomKey = data?.roomId?.toString()  
+    const room = rooms.get(roomKey) 
+    io.to(roomKey).emit('shuffle', data)
+    io.to(roomKey).emit('msg', `${room.users.get(socket.id)} turned on shuffle mode`)  
+  })
 
   socket.on('playing', (data) => {
     const roomKey = data?.roomId?.toString() 

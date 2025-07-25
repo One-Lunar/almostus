@@ -5,25 +5,24 @@ import { socket } from '../utils/socket'
 const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex}) => {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [isShuffle, setIsShuffle] = useState(false)
-  // const songs = [
-  //   'test_music/song1.mp3',
-  //   'test_music/song2.mp3',
-  //   'test_music/song3.mp3'
-  // ]
-  const toggleShuffle = (isShuffle) => {
-    setIsShuffle(prev => !prev)
-    socket.emit('shuffle', {roomId, isShuffle})
-  }
+  // const [isShuffle, setIsShuffle] = useState(false)
 
-  useState(() => {
-    socket.on('shuffle', (data) => {
-      setIsShuffle(data.isShuffle)
-    })
-    return () => {
-      socket.off('shuffle')
-    }
-  }, [])
+
+
+  // Future 
+  // const toggleShuffle = (isShuffle) => {
+  //   setIsShuffle(prev => !prev)
+  //   socket.emit('shuffle', {roomId, isShuffle})
+  // }
+
+  // useState(() => {
+  //   socket.on('shuffle', (data) => {
+  //     setIsShuffle(data.isShuffle)
+  //   })
+  //   return () => {
+  //     socket.off('shuffle')
+  //   }
+  // }, [])
 
   const playSong = async () => {
     if (audioRef.current) {
@@ -44,12 +43,13 @@ const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex})
   const nextSong = () => {
 
     setCurrentIndex((prevIndex) => {
-      let newIndex = prevIndex
-      if(isShuffle){
-        newIndex = Math.floor(Math.random() * songs.length)
-      }else{
-        newIndex = (prevIndex + 1) % songs.length
-      }
+      // Future 
+      // let newIndex = prevIndex
+      // if(isShuffle){
+      //   newIndex = Math.floor(Math.random() * songs.length)
+      // }else{
+      // }
+      let newIndex = (prevIndex + 1) % songs.length
       socket.emit('current-idx', {roomId, currentIdx: newIndex, onLoad: false, mode: 'next'})
       
       return newIndex
@@ -150,7 +150,7 @@ const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex})
       <SkipForward />
     </button>
     </div>
-    <div className='cursor-pointer'>
+    {/* <div className='cursor-pointer'>
       {!isShuffle ? <div
       onClick={() => toggleShuffle(true)}
       >
@@ -166,6 +166,9 @@ const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex})
         </div>
       </div>
       )}
+    </div> */}
+    <div>
+      <Dot />
     </div>
   </div>
 </div>

@@ -14,119 +14,88 @@ const Room = () => {
   const currentIdxParam = searchParams.get('currentIdx') 
   const [isPlaylistOpen, setIsPlaylistOpen] = useState(false)
   const [users, setUsers] = useState([]) 
-  const [currentIndex, setCurrentIndex] = useState(Number(currentIdxParam) || 0) 
+  const [currentIndex, setCurrentIndex] = useState(Number(currentIdxParam) || -1) 
   const [messages, setMessages] = useState([])
 
   const { songs, playlists, getAllPlaylists, getSongsByPlaylist } = usePlaylistStore() 
-
-  // Join room and set up listeners
-  useEffect(() => {
-    if (!roomId) return 
-
-    socket.emit('join-room', roomId) 
-
-    const msgHandler = (msg) => {
-      setMessages(prev => [...prev, msg])
-    }
-
-    const roomInfoHandler = (info) => setUsers(info) 
-
-    
-
-    const currentIdxHandler = (idx) => {
-      setCurrentIndex(idx) 
-      setSearchParams((prev) => {
-        const updated = new URLSearchParams(prev) 
-        updated.set('currentIdx', idx) 
-        if (playlistId) updated.set('playlist', playlistId) 
-        return updated 
-      }) 
-    } 
-
-    
-
-    socket.on('msg', msgHandler) 
-    socket.on('room-info', roomInfoHandler) 
-    socket.on('current-idx', currentIdxHandler) 
-
-    return () => {
-      socket.off('msg', msgHandler) 
-      socket.off('room-info', roomInfoHandler) 
-      socket.off('current-idx', currentIdxHandler) 
-    } 
-  }, [roomId]) 
+  const username = users.filter(user => user[0] == socket.id)
+  // Data Fetchers
 
   useEffect(() => {
-    const playlistAddHandler = (playlistId) => {
-      setSearchParams((prev) => {
-        const updated = new URLSearchParams(prev) 
-        updated.set('playlist', playlistId) 
-        updated.delete('currentIdx') 
-        return updated 
-      }) 
-    } 
-    const roomStateHandler = ({ playlistId, currentIndex }) => {
-      setCurrentIndex(currentIndex ?? 0) 
-      setSearchParams((prev) => {
-        const updated = new URLSearchParams(prev) 
-        if (playlistId) updated.set('playlist', playlistId) 
-        if (typeof currentIndex === 'number') updated.set('currentIdx', currentIndex) 
-        return updated 
-      }) 
-    } 
-    socket.on('playlist', playlistAddHandler) 
-    socket.on('room-state', roomStateHandler) 
+    getAllPlaylists()
+  }, [])
 
-    return () => {
-      socket.off('room-state', roomStateHandler) 
-      socket.off('playlist', playlistAddHandler) 
-    }
+  useEffect(() => {
+    playlistId && getSongsByPlaylist(playlistId)
   }, [playlistId])
-  // Get all playlists once
-  useEffect(() => {
-    getAllPlaylists() 
-  }, []) 
 
-  // Fetch songs when playlistId changes
-  useEffect(() => {
-    if (playlistId) {
-      getSongsByPlaylist(playlistId) 
-    }
-  }, [playlistId]) 
+  
+  // Params Helper function 
+  const paramsSetter = (currentIndex, playlistId) => {
 
-  const selectPlaylist = (playlistId) => {
-    socket.emit('playlist', { playlistId, roomId }) 
-    roomId && socket.emit("playing", {roomId, playing: false})
     setSearchParams((prev) => {
-      const updated = new URLSearchParams(prev) 
-      if (playlistId) updated.set('playlist', playlistId) 
-      return updated 
-    }) 
-  } 
+        const updated = new URLSearchParams(prev) 
+
+        if (currentIndex != -1) {
+          updated.set('currentIndex', currentIndex) 
+        }else{
+          updated.delete('currentIndex') 
+        }
+
+        if (playlistId) {
+          updated.set('playlist', playlistId) 
+        }else{
+          updated.delete('playlist') 
+        }
+        return updated 
+      }) 
+  }
+
+  // Joining the room using RoomId
+  useEffect(() => {
+    socket.emit('join-room', roomId)
+    socket.on('room-info', (info) => {
+      setUsers(info)
+    })
+
+    
+    return () => {
+      socket.off('room-info')
+    }
+    
+  }, [roomId])
+
+  useEffect(() => {
+    socket.on('msg', (msg) => {
+      setMessages(prev => [...prev, msg])
+    })
+  }, [])
+
+  useEffect(() => {
+  const handleRoomState = (data) => {
+    paramsSetter(data.currentIndex, data.playlistId)
+    setCurrentIndex(data.currentIndex ?? -1)
+  }
+
+  socket.on('room-state', handleRoomState)
+  return () => {
+    socket.off('room-state', handleRoomState)
+  }
+}, [playlistId, roomId])
+
+  
+  const selectPlaylist = (playlistId) => {
+    socket.emit('playlist', {roomId, playlistId})
+  }
 
   const selectedSong = (idx) => {
-    setCurrentIndex(idx) 
-    socket.emit('set-current-idx', { playlistId, roomId, currentIdx: idx }) 
-    setSearchParams((prev) => {
-      const updated = new URLSearchParams(prev) 
-      updated.set('currentIdx', idx) 
-      if (playlistId) updated.set('playlist', playlistId) 
-      return updated 
-    }) 
-  } 
-
+    socket.emit('current-idx', {roomId, currentIdx: idx, mode: 'select'})
+  }
+  
   const changePlaylist = () => {
+    socket.emit('playlist', {roomId, playlistId: null})
+  }
 
-    socket.emit('set-current-idx', { playlistId:null, roomId, currentIdx: 0 }) 
-    socket.emit('playlist', { playlistId:null, roomId }) 
-    roomId && socket.emit('playing', { roomId, playing: false }) 
-    setSearchParams((prev) => {
-      const updated = new URLSearchParams(prev) 
-      updated.set('playlist', null) 
-      updated.delete('currentIdx') 
-      return updated 
-    }) 
-  } 
 
 
 return (
@@ -134,20 +103,20 @@ return (
     <div className="text-2xl font-semibold tracking-tight">Room ID: {roomId}</div>
 
     <div className="space-y-2">
-      <h2 className="text-sm uppercase tracking-widest text-zinc-400">Members</h2>
+      <h2 className="text-sm uppercase tracking-widest text-zinc-400">Members : {users.length}</h2>
       <ul className="flex flex-wrap items-center gap-3">
         {users?.map((user) => (
           <li
             key={user}
-            className="bg-zinc-800 text-zinc-300 border border-zinc-700 rounded-full px-4 py-1 text-xs"
+            className="bg-zinc-800 flex gap-5 items-center text-zinc-300 border border-zinc-700 rounded-full px-4 py-1 text-xs"
           >
-            {user[1]}
+            {user[1]} {socket.id == user[0] &&  <div className='w-1 h-1 bg-amber-300 animate-pulse rounded-full'></div>}
           </li>
         ))}
       </ul>
     </div>
 
-    {(!songs) && (
+    {(!playlistId) && (
   <div className="w-full space-y-4">
     <button
       onClick={() => setIsPlaylistOpen(!isPlaylistOpen)}
@@ -186,6 +155,15 @@ return (
         ))}
       </div>
     </div>
+  </div>
+)}
+
+{playlistId && (
+  <div>
+    <button 
+    className='bg-white text-black p-2 rounded-md text-sm cursor-pointer'
+    onClick={changePlaylist}
+    >Change playlist</button>
   </div>
 )}
 

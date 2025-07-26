@@ -145,7 +145,7 @@ useEffect(() => {
     <div className='flex items-center gap-5'>
       <div className='rounded-mdp-1' >
         {songs[currentIndex] ?   <img className='lg:w-20 lg:h-20 w-15 h-15 object-contain' src={songs[currentIndex]?.coverimg} alt="" /> : (
-          <div className='w-20 h-20 border border-zinc-800 p-1 bg-zinc-800 animate-pulse'></div>
+          <div className='w-15 h-15 border border-zinc-800 p-1 bg-zinc-800 animate-pulse'></div>
         )}
       </div>  
       <div className='flex justify-start flex-col gap-2'>
@@ -161,14 +161,14 @@ useEffect(() => {
     <div className='flex gap-3'>
       <button
       onClick={previousSong}
-      className="text-zinc-300 hover:text-white transition-colors"
+      className="text-zinc-300 hidden lg:block hover:text-white transition-colors"
     >
       <SkipBack />
     </button>
 
     {!isPlaying && <button
       onClick={playSong}
-      className="bg-white text-zinc-900 p-3 rounded-full hover:scale-105 transition"
+      className="bg-white  text-zinc-900 p-3 rounded-full hover:scale-105 transition"
     >
       <Play />
     </button>}
@@ -182,7 +182,7 @@ useEffect(() => {
 
     <button
       onClick={nextSong}
-      className="text-zinc-300 hover:text-white transition-colors"
+      className="text-zinc-300 hidden lg:block hover:text-white transition-colors"
     >
       <SkipForward />
     </button>

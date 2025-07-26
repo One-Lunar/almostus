@@ -143,7 +143,7 @@ return (
         {playlists?.map((playlist) => (
           <div
             key={playlist._id}
-            className="flex items-center gap-4 p-4 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
+            className="flex items-center gap-4 w-70 p-1 pr-5 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
           >
             <img
               src={playlist.coverimg}
@@ -175,20 +175,20 @@ return (
   </div>
 )}
 
-    <div className="flex flex-col gap-3 mb-20 items-center">
+    <div className="flex lg:flex-row justify-center items-center flex-wrap flex-col lg:gap-2 gap-1 mb-20 ">
       {songs?.map((song, idx) => (
         <div
           key={song._id}
           onClick={() => selectedSong(idx)}
-          className="flex items-center gap-4 w-full max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
+          className="flex items-center gap-4 w-100 max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
         >
           <img
             src={song.coverimg}
             alt={song.title}
-            className="w-16 h-16 object-cover rounded-md"
+            className="lg:w-15 lg:h-15 w-13 h-13 object-cover rounded-md"
           />
           <div>
-            <h4 className="text-sm font-medium text-white">{song.title}</h4>
+            <h4 className="lg:text-md text-sm font-medium text-white">{song.title}</h4>
             <p className="text-xs text-zinc-400">{song.author}</p>
           </div>
         </div>

@@ -7,6 +7,7 @@ import NotificationModal from './NotificationModal'
 import { ChevronDown, ChevronUp, Share } from 'lucide-react'
 import Songs from '../components_main/Songs'
 import Button from '../chunks/Button'
+import Emoji from './Emoji'
 
 const Room = () => {
   const { id: roomId } = useParams() 
@@ -21,7 +22,8 @@ const Room = () => {
   const navigate = useNavigate()
 
   const { songs, playlists, getAllPlaylists, getSongsByPlaylist } = usePlaylistStore() 
-  const username = users.filter(user => user[0] == socket.id)
+  const username = users && users.filter(user => user[0] == socket.id)[0]
+  console.log(username)
   // Data Fetchers
 
   useEffect(() => {
@@ -189,7 +191,7 @@ return (
         />
       </div>
     )}
-
+    <Emoji roomId={roomId} username={username}/>
     <NotificationModal messages={messages} />
   </div>
 )

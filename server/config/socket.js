@@ -153,6 +153,11 @@ io.on('connection', (socket) => {
     io.to(roomKey).emit('duration', data)
   })   
 
+  socket.on('emoji', (data) => {
+  const roomKey = data?.roomId?.toString() 
+  io.to(roomKey).emit('emoji', data)
+  })
+
   socket.on('disconnect', () => {
     rooms.forEach((room, roomId) => {
       if (room.users.has(socket.id)) {

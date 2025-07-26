@@ -100,7 +100,7 @@ const Room = () => {
 
 
 return (
-  <div className="min-h-screen bg-zinc-900 text-white px-6 py-8 space-y-8">
+  <div className="min-h-screen bg-zinc-900 text-white px-2 py-8 space-y-8">
     <div className="text-2xl font-semibold tracking-tight flex justify-between ">
       <h1>Room ID: {roomId}</h1>
       <button 
@@ -143,7 +143,7 @@ return (
         {playlists?.map((playlist) => (
           <div
             key={playlist._id}
-            className="flex items-center gap-4 w-70 p-1 pr-5 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
+            className="flex items-center gap-4 p-1 pr-5 lg:w-70 w-full bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
           >
             <img
               src={playlist.coverimg}
@@ -180,7 +180,7 @@ return (
         <div
           key={song._id}
           onClick={() => selectedSong(idx)}
-          className="flex items-center gap-4 w-100 max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
+          className="flex items-center gap-4 lg:w-100 w-full max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
         >
           <img
             src={song.coverimg}

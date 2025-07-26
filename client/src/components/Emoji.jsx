@@ -10,11 +10,15 @@ const Emoji = ({roomId, username}) => {
     const emojiList = ['😂','🔥','♥️','🤮']
 
     const handleEmojiClick = (emoji) => {
+     
         socket.emit('emoji', {emoji,username: username[1], roomId})
     }
 
     useEffect(() => {
   const handleEmoji = (data) => {
+    console.log('BUBBLES:', bubbles)
+      console.log('EMOJI RECEIVED:', data)
+      
     setBubbles((prev) => [
       ...prev,
       {
@@ -33,6 +37,7 @@ const Emoji = ({roomId, username}) => {
   }
 }, []) // ✅ FIXED
 
+ 
   return (
     <div>
         <div className="fixed right-12 bottom-10">

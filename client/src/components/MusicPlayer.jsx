@@ -255,7 +255,7 @@ useEffect(() => {
       <Shuffle className={`${isShuffle ? 'text-green-500': 'text-white'}`}
       onClick={toggleShuffle}
       />
-      <h1 className='flex gap-1 items-center text-zinc-300 text-xs border border-zinc-600 p-1 rounded-md'><ArrowBigUp size={15}/>H</h1>
+      <h1 className=' gap-1 items-center text-zinc-300 hidden lg:flex text-xs border border-zinc-600 p-1 rounded-md'><ArrowBigUp size={15}/>H</h1>
     </div>}
   </div>
 </div>

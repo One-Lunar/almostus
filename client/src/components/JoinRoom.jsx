@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { socket } from '../utils/socket'
 import { useNavigate } from 'react-router-dom'
+import Button from '../chunks/Button'
 
 const JoinRoom = () => {
     const navigate = useNavigate()
@@ -18,12 +19,12 @@ const JoinRoom = () => {
         <h1 className='font-black my-10 text-6xl'>Join Room</h1>
        <div className='flex gap-5 items-center'>
          <input 
-        className='border h-full border-zinc-600 rounded-md outline-none p-1 text-sm'
+        className='border h-full border-zinc-600 rounded-md outline-none p-2 text-sm'
         onChange={(e) => setRoomId(e.target.value)}
         placeholder='Enter the room Id'
         type="text"
          />
-        <button onClick={handleSubmit} className='bg-zinc-100 cursor-pointer text-sm text-black px-3 py-2 rounded-md'>Join</button>
+        <Button text={"Join"} click={handleSubmit} />
        </div>
     </div>
   )

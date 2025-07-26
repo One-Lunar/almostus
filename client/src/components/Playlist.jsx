@@ -42,15 +42,15 @@ const PlaylistList = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {playlists.map((playlist) => (
           <Link key={playlist._id} to={`/playlist/${playlist._id}`} className="hover:shadow-lg transition-shadow duration-300">
-            <div key={playlist._id} className="border rounded-lg shadow-md p-4 bg-white">
+            <div key={playlist._id} className="border shadow-md p-4 bg-zinc-800  border-zinc-700 rounded-xl hover:border-zinc-600 transition">
               <img
                 src={playlist.coverimg}
                 alt={playlist.title}
                 className="w-full h-48 object-cover rounded"
               />
               <h3 className="text-xl font-semibold mt-3">{playlist.title}</h3>
-              <p className="text-gray-700">Author: {playlist.author}</p>
-              <p className="text-gray-500 text-sm mt-1">{playlist.description}</p>
+              <p className="text-white">Author: {playlist.author}</p>
+              <p className="text-zinc-400 text-sm mt-1">{playlist.description}</p>
             </div>
           </Link>
         ))}

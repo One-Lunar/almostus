@@ -25,7 +25,7 @@ const Emoji = ({roomId, username}) => {
         emoji: data.emoji,
         username: data.username,
         id: Date.now(),
-        x: Math.floor(Math.random() * 50 - 25), // add some left/right variation
+        x: Math.floor(Math.random() * 50 - 25), 
       },
     ])
   }
@@ -45,11 +45,11 @@ const Emoji = ({roomId, username}) => {
     {bubbles.map((bubble) => (
       <motion.div
         key={bubble.id}
-        initial={{ opacity: 1, y: 0, x: -400, scale: 1 }}
+        initial={{ opacity: 1, y: 0, x: -200, scale: 1 }}
         animate={{
           opacity: 0,
           y: -250,
-          x: bubble.x-400,
+          x: bubble.x-200,
           scale: 1.3,
         }}
         exit={{ opacity: 0 }}

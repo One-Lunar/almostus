@@ -7,7 +7,7 @@ const Songs = ({songs, selectedSong, isRoom}) => {
         <div
           key={song._id}
           onClick={() => selectedSong(idx)}
-          className={`flex items-center gap-4 lg:w-100 ${!isRoom && 'lg:w-full'} w-full max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition`}
+          className={`flex items-center gap-4 select-none lg:w-100 ${!isRoom && 'lg:w-full'} w-full max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition`}
         >
           <img
             src={song.coverimg}

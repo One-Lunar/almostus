@@ -4,7 +4,7 @@ import { socket } from '../utils/socket'
 import { usePlaylistStore } from '../stores/usePlaylistStore' 
 import MusicPlayer from './MusicPlayer' 
 import NotificationModal from './NotificationModal'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, Share } from 'lucide-react'
 
 const Room = () => {
   const { id: roomId } = useParams() 
@@ -102,7 +102,15 @@ const Room = () => {
 return (
   <div className="min-h-screen bg-zinc-900 text-white px-2 py-8 space-y-8">
     <div className="text-2xl font-semibold tracking-tight flex justify-between ">
-      <h1>Room ID: {roomId}</h1>
+     <div className='flex  gap-5 items-center'>
+       <h1>Room ID: {roomId}</h1>
+      <div>
+        <Share className='cursor-pointer' onClick={() => {
+          navigator.clipboard.writeText(window.location.href)
+          setMessages(prev => [...prev, "Share Link Copied to Clipboard"])
+        }}/>
+      </div>
+     </div>
       <button 
       onClick={() => navigate('/')}
       className='bg-white cursor-pointer text-black text-sm px-2 py-1 rounded-md'

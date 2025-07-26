@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react' 
-import { useParams, useSearchParams } from 'react-router-dom' 
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom' 
 import { socket } from '../utils/socket' 
 import { usePlaylistStore } from '../stores/usePlaylistStore' 
 import MusicPlayer from './MusicPlayer' 
@@ -16,6 +16,7 @@ const Room = () => {
   const [users, setUsers] = useState([]) 
   const [currentIndex, setCurrentIndex] = useState(Number(currentIdxParam) || -1) 
   const [messages, setMessages] = useState([])
+  const navigate = useNavigate()
 
   const { songs, playlists, getAllPlaylists, getSongsByPlaylist } = usePlaylistStore() 
   const username = users.filter(user => user[0] == socket.id)
@@ -100,8 +101,15 @@ const Room = () => {
 
 return (
   <div className="min-h-screen bg-zinc-900 text-white px-6 py-8 space-y-8">
-    <div className="text-2xl font-semibold tracking-tight">Room ID: {roomId}</div>
-
+    <div className="text-2xl font-semibold tracking-tight flex justify-between ">
+      <h1>Room ID: {roomId}</h1>
+      <button 
+      onClick={() => navigate('/')}
+      className='bg-white cursor-pointer text-black text-sm px-2 py-1 rounded-md'
+      >Exit
+      </button>
+    </div>
+    
     <div className="space-y-2">
       <h2 className="text-sm uppercase tracking-widest text-zinc-400">Members : {users.length}</h2>
       <ul className="flex flex-wrap items-center gap-3">

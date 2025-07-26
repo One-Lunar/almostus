@@ -4,16 +4,16 @@ import axios from 'axios'
 import { usePlaylistStore } from '../stores/usePlaylistStore'
 import MusicPlayer from './MusicPlayer'
 import Songs from '../components_main/Songs'
+import Search from '../components_main/Search'
 
 const PlaylistInfo = () => {
   const { id } = useParams()
   const [playlist, setPlaylist] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [currentIndex, setCurrentIndex] = useState(0)
-  
+  const [currentIndex, setCurrentIndex] = useState(-1)
   const baseUrl = import.meta.env.VITE_ENV == "development" ? "http://localhost:8080" : "https://almostus.onrender.com"
-
+  
   const { songs, getSongsByPlaylist} = usePlaylistStore()
 
   useEffect(() => {
@@ -53,9 +53,9 @@ const PlaylistInfo = () => {
       <p className="text-gray-500">{playlist.description}</p>
       <div>
         <h1 className='text-2xl my-10 font-black text-white'>Songs</h1>
-        <Songs songs={songs} selectedSong={setCurrentIndex} isRoom={false}/>
+        <Songs songs={songs} selectedSong={setCurrentIndex} isRoom={false} />
       </div>
-      {songs && <MusicPlayer songs={songs} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} isRoom={false}/>}
+      {songs && <MusicPlayer songs={songs} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} isRoom={false} />}
     </div>
   ) 
 }

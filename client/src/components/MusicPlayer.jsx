@@ -1,4 +1,4 @@
-import { Dot, Pause, Play, Shuffle, SkipBack, SkipForward, ThermometerIcon } from 'lucide-react'
+import { ArrowBigUp, Dot, Pause, Play, Shuffle, SkipBack, SkipForward, ThermometerIcon } from 'lucide-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { socket } from '../utils/socket'
 
@@ -56,11 +56,12 @@ const nextSong = () => {
       } while (visited.has(newIndex))
 
       visited.add(newIndex)
-    } else {
+    } 
+    if(!isShuffle) {
       newIndex = (prevIndex + 1) % songs.length
       visited.add(newIndex)
     }
-
+    console.log("shuffle",isShuffle)
     socket.emit('current-idx', {
       roomId,
       currentIdx: newIndex,
@@ -86,12 +87,13 @@ const nextSong = () => {
 
   useEffect(() => {
     if(isPlaying){
-      audioRef.current.play()
+      playSong()
     }
     else{
-      audioRef.current.pause()
+      pauseSong()
     }
   }, [isPlaying])
+
   useEffect(() => {
     socket.on("playing", (playing) => {
       setIsPlaying(playing)
@@ -103,6 +105,51 @@ const nextSong = () => {
     }
   }, [])
   
+
+    // Function Keys 
+    useEffect(() => {
+        if (navigator.mediaSession) {
+          console.log(navigator.mediaSession)
+            navigator.mediaSession.setActionHandler('play', () => {
+                playSong()
+            });
+            navigator.mediaSession.setActionHandler('pause', () => {
+                pauseSong()
+            });
+            navigator.mediaSession.setActionHandler('nexttrack', () => {
+                nextSong()
+            });
+            navigator.mediaSession.setActionHandler('previoustrack', () => {
+
+                previousSong()
+            });
+        }
+    }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Prevent the default scrolling behavior
+      if ((e.keyCode === 32 || e.code === 'Space') && e.target === document.body) {
+        e.preventDefault() 
+      }
+
+      // Play Pause 
+      if(e.code == "Space"){
+        e.preventDefault()
+        setIsPlaying(prev => !prev)
+      }
+        if(e.code == "KeyH"){
+          setIsShuffle(prev => !prev)
+      }
+
+    }
+
+    document.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [])
 
 
 useEffect(() => {
@@ -204,10 +251,11 @@ useEffect(() => {
     </button>
     </div>
     
-    {!isRoom && <div className='cursor-pointer'>
+    {!isRoom && <div className='cursor-pointer flex items-center gap-2'>
       <Shuffle className={`${isShuffle ? 'text-green-500': 'text-white'}`}
       onClick={toggleShuffle}
       />
+      <h1 className='flex gap-1 items-center text-zinc-300 text-xs border border-zinc-600 p-1 rounded-md'><ArrowBigUp size={15}/>H</h1>
     </div>}
   </div>
 </div>

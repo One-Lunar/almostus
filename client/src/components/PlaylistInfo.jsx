@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { usePlaylistStore } from '../stores/usePlaylistStore'
 import MusicPlayer from './MusicPlayer'
+import Songs from '../components_main/Songs'
 
 const PlaylistInfo = () => {
   const { id } = useParams()
@@ -52,23 +53,11 @@ const PlaylistInfo = () => {
       <p className="text-gray-500">{playlist.description}</p>
       <div>
         <h1 className='text-2xl my-10 font-black text-white'>Songs</h1>
-        <div className='flex flex-col justify-center gap-1'>
-            {songs && songs?.map((song,idx) => (
-              <div 
-              onClick={() => setCurrentIndex(idx)}
-              className='text-white cursor-pointer flex items-center gap-3 bg-zinc-800 p-1 rounded-md border-zinc-700'>
-                <img className='lg:w-15 w-12' src={song.coverimg} alt="" />
-                <div>
-                  <h1 className='lg:text-md text-sm'>{song.title}</h1>
-                  <p className='text-xs text-zinc-300'>{song.author}</p>
-                </div>
-              </div>
-            ))}
-        </div>
+        <Songs songs={songs} selectedSong={setCurrentIndex} isRoom={false}/>
       </div>
-      {songs && <MusicPlayer songs={songs} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex}/>}
+      {songs && <MusicPlayer songs={songs} currentIndex={currentIndex} setCurrentIndex={setCurrentIndex} isRoom={false}/>}
     </div>
-  )
+  ) 
 }
 
 export default PlaylistInfo

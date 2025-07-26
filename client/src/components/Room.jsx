@@ -5,6 +5,8 @@ import { usePlaylistStore } from '../stores/usePlaylistStore'
 import MusicPlayer from './MusicPlayer' 
 import NotificationModal from './NotificationModal'
 import { ChevronDown, ChevronUp, Share } from 'lucide-react'
+import Songs from '../components_main/Songs'
+import Button from '../chunks/Button'
 
 const Room = () => {
   const { id: roomId } = useParams() 
@@ -111,11 +113,7 @@ return (
         }}/>
       </div>
      </div>
-      <button 
-      onClick={() => navigate('/')}
-      className='bg-white cursor-pointer text-black text-sm px-2 py-1 rounded-md'
-      >Exit
-      </button>
+      <Button text={"Exit"} click={() => navigate('/')} />
     </div>
     
     <div className="space-y-2">
@@ -161,12 +159,9 @@ return (
             <div className="flex-1">
               <h3 className="text-base font-medium text-white">{playlist.title}</h3>
             </div>
-            <button
-              onClick={() => selectPlaylist(playlist._id)}
-              className="text-xs px-3 py-1 bg-white text-zinc-900 rounded hover:bg-zinc-200 transition"
-            >
-              Select
-            </button>
+            
+          <Button text={"Select"} click={() =>  selectPlaylist(playlist._id)} />
+            
           </div>
         ))}
       </div>
@@ -176,32 +171,11 @@ return (
 
 {playlistId && (
   <div>
-    <button 
-    className='bg-white text-black p-2 rounded-md text-sm cursor-pointer'
-    onClick={changePlaylist}
-    >Change playlist</button>
+    <Button text={"Change Playlist"} click={changePlaylist} />
   </div>
 )}
 
-    <div className="flex lg:flex-row justify-center items-center flex-wrap flex-col lg:gap-2 gap-1 mb-20 ">
-      {songs?.map((song, idx) => (
-        <div
-          key={song._id}
-          onClick={() => selectedSong(idx)}
-          className="flex items-center gap-4 lg:w-100 w-full max-w-2xl cursor-pointer p-1 bg-zinc-800 border border-zinc-700 rounded-xl hover:border-zinc-600 transition"
-        >
-          <img
-            src={song.coverimg}
-            alt={song.title}
-            className="lg:w-15 lg:h-15 w-13 h-13 object-cover rounded-md"
-          />
-          <div>
-            <h4 className="lg:text-md text-sm font-medium text-white">{song.title}</h4>
-            <p className="text-xs text-zinc-400">{song.author}</p>
-          </div>
-        </div>
-      ))}
-    </div>
+    <Songs songs={songs} selectedSong={selectedSong} isRoom={true}/>
 
     {songs && (
       <div className="mt-8">
@@ -211,6 +185,7 @@ return (
           songs={songs}
           currentIndex={currentIndex}
           setCurrentIndex={setCurrentIndex}
+          isRoom={true}
         />
       </div>
     )}

@@ -2,20 +2,20 @@ import { Dot, Pause, Play, Shuffle, SkipBack, SkipForward, ThermometerIcon } fro
 import React, { useEffect, useRef, useState } from 'react'
 import { socket } from '../utils/socket'
 
-const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex}) => {
+const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex, isRoom}) => {
   const audioRef = useRef(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
 
-  // const [isShuffle, setIsShuffle] = useState(false)
-
+  const [isShuffle, setIsShuffle] = useState(false)
+  const visited = new Set()
 
 
   // Future 
-  // const toggleShuffle = (isShuffle) => {
-  //   setIsShuffle(prev => !prev)
-  //   socket.emit('shuffle', {roomId, isShuffle})
-  // }
+  const toggleShuffle = () => {
+    setIsShuffle(prev => !prev)
+    // socket.emit('shuffle', {roomId, isShuffle})
+  }
 
   // useState(() => {
   //   socket.on('shuffle', (data) => {
@@ -42,22 +42,37 @@ const MusicPlayer = ({roomId, playlistId, songs, currentIndex, setCurrentIndex})
     }
   }
 
-  const nextSong = () => {
+const nextSong = () => {
+  setCurrentIndex((prevIndex) => {
+    let newIndex = prevIndex
 
-    setCurrentIndex((prevIndex) => {
-      // Future 
-      // let newIndex = prevIndex
-      // if(isShuffle){
-      //   newIndex = Math.floor(Math.random() * songs.length)
-      // }else{
-      // }
-      let newIndex = (prevIndex + 1) % songs.length
-      socket.emit('current-idx', {roomId, currentIdx: newIndex, onLoad: false, mode: 'next'})
-      
-      return newIndex
+    if (isShuffle && !isRoom) {
+      if (visited.size === songs.length) {
+        visited.clear()
+      }
+
+      do {
+        newIndex = Math.floor(Math.random() * songs.length)
+      } while (visited.has(newIndex))
+
+      visited.add(newIndex)
+    } else {
+      newIndex = (prevIndex + 1) % songs.length
+      visited.add(newIndex)
+    }
+
+    socket.emit('current-idx', {
+      roomId,
+      currentIdx: newIndex,
+      onLoad: false,
+      mode: 'next',
     })
-    setIsPlaying(true)
-  }
+    console.log(visited)
+    return newIndex
+  })
+  setIsPlaying(true)
+}
+
 
   const previousSong = () => {
     setCurrentIndex((prevIndex) => {
@@ -114,7 +129,8 @@ useEffect(() => {
   link.rel = 'icon';
   link.href = coverImg;
   link.type = 'image/png';
-
+  const title = document.querySelector('title')
+  title.innerText = songs[currentIndex]?.title
   document.head.appendChild(link);
 }, [currentIndex, songs]);
 
@@ -187,26 +203,12 @@ useEffect(() => {
       <SkipForward />
     </button>
     </div>
-    {/* <div className='cursor-pointer'>
-      {!isShuffle ? <div
-      onClick={() => toggleShuffle(true)}
-      >
-        <Shuffle />
-        <div className='w-1 animate-pulse h-1 rounded-full'>
-        </div>
-      </div> : (
-      <div 
-      onClick={() => toggleShuffle(false)}
-      className='flex flex-col items-center gap-2'>
-        <Shuffle  className='text-green-500'/>
-        <div className='w-1 animate-pulse h-1 bg-green-500 rounded-full'>
-        </div>
-      </div>
-      )}
-    </div> */}
-    <div className='hidden lg:flex'>
-      <Dot />
-    </div>
+    
+    {!isRoom && <div className='cursor-pointer'>
+      <Shuffle className={`${isShuffle ? 'text-green-500': 'text-white'}`}
+      onClick={toggleShuffle}
+      />
+    </div>}
   </div>
 </div>
 

@@ -14,14 +14,24 @@ const Emoji = ({roomId, username}) => {
     }
 
     useEffect(() => {
-        socket.on('emoji', (data) => {
-        setBubbles(prev => [...prev, {emoji: data.emoji,username:data.username, id: new Date().getTime(), x: Math.floor(Math.random() * 50)}])
-        })
+  const handleEmoji = (data) => {
+    setBubbles((prev) => [
+      ...prev,
+      {
+        emoji: data.emoji,
+        username: data.username,
+        id: Date.now(),
+        x: Math.floor(Math.random() * 50 - 25), // add some left/right variation
+      },
+    ])
+  }
 
-        return () => {
-            socket.off('emoji')
-        }
-    }, [bubbles])
+  socket.on('emoji', handleEmoji)
+
+  return () => {
+    socket.off('emoji', handleEmoji)
+  }
+}, []) // ✅ FIXED
 
   return (
     <div>

@@ -143,14 +143,13 @@ useEffect(() => {
 
   <div className="flex items-center justify-between">
     <div className='flex items-center gap-5'>
-      <div className='w-20 h-20 rounded-md border border-zinc-800 p-1' >
-        {songs[currentIndex] ?   <img src={songs[currentIndex]?.coverimg} alt="" /> : (
+      <div className='rounded-mdp-1' >
+        {songs[currentIndex] ?   <img className='lg:w-20 lg:h-20 w-15 h-15 object-contain' src={songs[currentIndex]?.coverimg} alt="" /> : (
           <div className='w-20 h-20 border border-zinc-800 p-1 bg-zinc-800 animate-pulse'></div>
         )}
-
-      </div>
+      </div>  
       <div className='flex justify-start flex-col gap-2'>
-      {songs[currentIndex] ?  <h1 className='text-md text-zinc-100'>{songs[currentIndex]?.title.slice(0,45)}</h1> : (
+      {songs[currentIndex] ?  <h1 className='lg:text-md text-sm text-zinc-100'>{songs[currentIndex]?.title.slice(0,45)}</h1> : (
         <div className={`w-30 h-4 bg-zinc-800 animate-pulse rounded-md`}></div>
       )}
         {songs[currentIndex] ?   <p className='text-xs text-zinc-300'>{songs[currentIndex]?.author}</p>  
@@ -159,7 +158,7 @@ useEffect(() => {
       )}
       </div>
     </div>
-    <div className='flex gap-5'>
+    <div className='flex gap-3'>
       <button
       onClick={previousSong}
       className="text-zinc-300 hover:text-white transition-colors"
@@ -205,7 +204,7 @@ useEffect(() => {
       </div>
       )}
     </div> */}
-    <div>
+    <div className='hidden lg:flex'>
       <Dot />
     </div>
   </div>
